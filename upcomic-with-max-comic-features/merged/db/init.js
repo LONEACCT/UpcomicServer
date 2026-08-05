@@ -1,10 +1,7 @@
 const fs = require('fs');
 const path = require('path');
-const db = require('./index');
-
-// Make sure the folder that holds the sqlite file exists
+const db = require('./index'); // creates the data/ folder + opens the DB
 const dataDir = path.join(__dirname, '..', 'data');
-if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS users (
