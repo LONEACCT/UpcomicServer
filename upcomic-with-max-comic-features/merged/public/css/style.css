@@ -68,9 +68,8 @@ header.topnav {
   position: sticky; top: 0; z-index: 50;
   backdrop-filter: blur(8px);
 }
-.wordmark { font-family: var(--font-wordmark); font-size: 22px; letter-spacing: 0.01em; }
-.wordmark .up { color: #fff; }
-.wordmark .comic { color: var(--red-bright); }
+.wordmark { display: flex; align-items: center; }
+.wordmark .logo-img { height: 34px; width: auto; display: block; }
 
 nav.main-links { display: flex; gap: 26px; }
 nav.main-links a {
@@ -419,8 +418,6 @@ textarea { resize: vertical; min-height: 90px; }
 .admin-shell { display: flex; min-height: 100vh; }
 .admin-sidebar { width: 220px; flex-shrink: 0; background: var(--panel); border-right: 1px solid var(--line); padding: 24px 0; position: sticky; top: 0; height: 100vh; }
 .admin-sidebar .brand-mini { display: flex; align-items: center; padding: 0 20px 20px; border-bottom: 1px solid var(--line); margin-bottom: 16px; }
-.admin-sidebar .brand-mini span { font-family: var(--font-wordmark); font-size: 17px; }
-.admin-sidebar .brand-mini .up { color: #fff; } .admin-sidebar .brand-mini .comicb { color: var(--red-bright); }
 .admin-nav-link { display: block; padding: 11px 20px; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-mid); border-left: 2px solid transparent; }
 .admin-nav-link:hover { color: #fff; background: var(--panel-2); }
 .admin-nav-link.active { color: var(--red-bright); border-left-color: var(--red-bright); background: var(--panel-2); }
@@ -482,7 +479,7 @@ table.admin-table td.mono { font-family: var(--font-mono); font-size: 12.5px; }
   .hamburger-icon { display: flex; }
   .header-right { gap: 10px; }
   .vip-btn { padding: 8px 12px; font-size: 10px; }
-  .wordmark { font-size: 18px; }
+  .wordmark .logo-img { height: 28px; }
   .mobile-nav-panel { display: flex; }
 
   .hero { margin: 12px 12px 0; min-height: 280px; border-radius: 14px; }
