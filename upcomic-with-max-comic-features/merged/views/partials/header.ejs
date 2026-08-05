@@ -4,6 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' — ' + siteName : siteName %></title>
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Oswald:wght@500;600;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css" />
@@ -12,7 +17,7 @@
   <input type="checkbox" id="mobileNavToggle" class="mobile-nav-toggle" />
 
   <header class="topnav">
-    <a href="/" class="wordmark"><span class="up">UP</span><span class="comic">COMIC</span></a>
+    <a href="/" class="wordmark"><img src="/icons/logo.png" alt="<%= siteName %>" class="logo-img" /></a>
     <nav class="main-links">
       <a href="/" class="<%= typeof active !== 'undefined' && active === 'home' ? 'active' : '' %>">Home</a>
       <a href="/#browse" class="<%= typeof active !== 'undefined' && active === 'browse' ? 'active' : '' %>">Comics</a>
