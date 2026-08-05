@@ -1,0 +1,47 @@
+<%- include('../partials/admin-header', { pageTitle: 'Reported Comments', active: 'reported-comments' }) %>
+
+<div class="admin-topbar">
+  <h1>Reported comments</h1>
+</div>
+
+<table class="admin-table">
+  <thead>
+    <tr>
+      <th>Comment</th>
+      <th>By</th>
+      <th>On</th>
+      <th>Reports</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (reported.length === 0) { %>
+      <tr class="admin-empty-row"><td colspan="5">No reported comments right now.</td></tr>
+    <% } else { %>
+      <% reported.forEach(c => { %>
+        <tr>
+          <td style="max-width:320px;"><%= c.body %></td>
+          <td><%= c.username %></td>
+          <td>
+            <a href="/comic/<%= c.comic_slug %>/chapter/<%= c.chapter_id %>" target="_blank">
+              <%= c.comic_title %> — Ch. <%= c.chapter_number %>
+            </a>
+          </td>
+          <td class="mono"><%= c.report_count %></td>
+          <td>
+            <div class="btn-row">
+              <form action="/admin/comments/<%= c.id %>/dismiss" method="POST">
+                <button type="submit" class="btn btn-ghost btn-small">Dismiss</button>
+              </form>
+              <form action="/admin/comments/<%= c.id %>/delete" method="POST" onsubmit="return confirm('Delete this comment permanently?');">
+                <button type="submit" class="btn btn-ghost btn-small" style="color:var(--danger);">Delete</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+      <% }) %>
+    <% } %>
+  </tbody>
+</table>
+
+<%- include('../partials/admin-footer') %>

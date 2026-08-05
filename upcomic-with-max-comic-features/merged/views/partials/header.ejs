@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' — ' + siteName : siteName %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Oswald:wght@500;600;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body class="has-bottom-tabs">
+  <input type="checkbox" id="mobileNavToggle" class="mobile-nav-toggle" />
+
+  <header class="topnav">
+    <a href="/" class="wordmark"><span class="up">UP</span><span class="comic">COMIC</span></a>
+    <nav class="main-links">
+      <a href="/" class="<%= typeof active !== 'undefined' && active === 'home' ? 'active' : '' %>">Home</a>
+      <a href="/#browse" class="<%= typeof active !== 'undefined' && active === 'browse' ? 'active' : '' %>">Comics</a>
+      <a href="/#browse">Genres</a>
+      <a href="/vip" class="<%= typeof active !== 'undefined' && active === 'vip' ? 'active' : '' %>">VIP</a>
+      <a href="/#browse">Updates</a>
+      <a href="https://t.me/<%= telegramAdmin.replace('@','') %>" target="_blank" rel="noopener">Contact</a>
+    </nav>
+    <div class="header-right">
+      <form class="search-pill" action="/" method="GET">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" name="q" placeholder="Search comics..." />
+      </form>
+      <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+        <a href="/redeem" class="login-link">Redeem</a>
+      <% } else { %>
+        <a href="/login" class="login-link">Login</a>
+      <% } %>
+      <a href="/vip" class="vip-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M2 18h20l-2-9-5 4-3-7-3 7-5-4z"/></svg>
+        Join VIP
+      </a>
+      <label for="mobileNavToggle" class="hamburger-icon" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+      </label>
+    </div>
+  </header>
+
+  <label for="mobileNavToggle" class="mobile-nav-backdrop"></label>
+  <div class="mobile-nav-panel">
+    <label for="mobileNavToggle" class="mobile-nav-close" aria-label="Close menu">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>
+    </label>
+    <a href="/">Home</a>
+    <a href="/#browse">Comics</a>
+    <a href="/#browse">Genres</a>
+    <a href="/vip" class="vip-item">VIP</a>
+    <a href="/#browse">Updates</a>
+    <a href="https://t.me/<%= telegramAdmin.replace('@','') %>" target="_blank" rel="noopener">Contact</a>
+    <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+      <a href="/redeem">Redeem code</a>
+      <form action="/logout" method="POST"><button type="submit">Log out</button></form>
+    <% } else { %>
+      <a href="/login">Log in</a>
+      <a href="/signup">Sign up</a>
+    <% } %>
+  </div>
+
+  <main>

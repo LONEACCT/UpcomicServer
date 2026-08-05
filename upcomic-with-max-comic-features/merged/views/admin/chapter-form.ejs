@@ -1,0 +1,57 @@
+<%- include('../partials/admin-header', { pageTitle: chapter ? 'Edit Chapter' : 'New Chapter', active: 'comics' }) %>
+
+<div class="admin-topbar">
+  <h1><%= chapter ? 'Edit chapter' : 'New chapter' %> — <%= comic.title %></h1>
+  <a href="/admin/comics/<%= comic.id %>/chapters" class="btn btn-ghost">← Back to chapters</a>
+</div>
+
+<% if (error) { %><div class="form-error" style="max-width:560px;"><%= error %></div><% } %>
+
+<%
+  const actionUrl = chapter
+    ? `/admin/comics/${comic.id}/chapters/${chapter.id}/edit`
+    : `/admin/comics/${comic.id}/chapters/new`;
+  const publishAtValue = chapter && chapter.publish_at ? chapter.publish_at.slice(0, 16) : '';
+%>
+
+<form action="<%= actionUrl %>" method="POST" enctype="multipart/form-data" style="max-width:560px;">
+  <div class="field">
+    <label for="title">Chapter title</label>
+    <input type="text" id="title" name="title" required placeholder="e.g. Chapter 1: First Night" value="<%= chapter ? chapter.title : '' %>" />
+  </div>
+  <div class="field">
+    <label for="chapter_number">Chapter number</label>
+    <input type="number" id="chapter_number" name="chapter_number" required min="1" step="1" value="<%= chapter ? chapter.chapter_number : '' %>" />
+  </div>
+  <div class="field">
+    <div class="checkbox-row">
+      <input type="checkbox" id="is_premium" name="is_premium" value="1" <%= chapter && chapter.is_premium ? 'checked' : '' %> />
+      <label for="is_premium">This is a premium (VIP-only) chapter</label>
+    </div>
+    <p class="hint">Free chapters are visible to everyone. Premium chapters route readers to the VIP page.</p>
+  </div>
+  <div class="field">
+    <label for="publish_at">Schedule for later (optional)</label>
+    <input type="datetime-local" id="publish_at" name="publish_at" value="<%= publishAtValue %>" />
+    <p class="hint">Leave blank to publish immediately. A scheduled chapter stays hidden from readers — and no notification goes out — until this time.</p>
+  </div>
+
+  <% if (!chapter) { %>
+    <div class="field">
+      <label for="pages">Chapter pages — manual select</label>
+      <input type="file" id="pages" name="pages" accept="image/*" multiple />
+      <p class="hint">Select all page images at once, in reading order. JPG, PNG, WebP, or GIF — up to 15MB each.</p>
+    </div>
+    <div class="field">
+      <label for="zip">— OR — upload a ZIP of images</label>
+      <input type="file" id="zip" name="zip" accept=".zip" />
+      <p class="hint">A single ZIP containing the page images. They'll be extracted and sorted automatically (e.g. page1.jpg, page2.jpg, ... page10.jpg). Use either this or manual select, not both.</p>
+    </div>
+  <% } else { %>
+    <p class="hint">To change this chapter's pages, use <a href="/admin/comics/<%= comic.id %>/chapters/<%= chapter.id %>/add-pages">Add pages</a> from the chapter list instead.</p>
+  <% } %>
+
+  <button type="submit" class="btn btn-red btn-block"><%= chapter ? 'Save changes' : 'Create chapter' %></button>
+</form>
+
+<%- include('../partials/admin-footer') %>

@@ -1,0 +1,31 @@
+<%- include('partials/header', { pageTitle: 'Create account' }) %>
+
+<div class="form-shell">
+  <h1>Create your account</h1>
+  <p class="sub">Needed to redeem a VIP code and keep your access.</p>
+
+  <% if (error) { %><div class="form-error"><%= error %></div><% } %>
+
+  <form action="/signup" method="POST">
+    <input type="hidden" name="next" value="<%= next %>" />
+    <div class="field">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" required minlength="3" autocomplete="username" />
+    </div>
+    <div class="field">
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required minlength="6" autocomplete="new-password" />
+    </div>
+    <div class="field">
+      <label for="confirm">Confirm password</label>
+      <input type="password" id="confirm" name="confirm" required minlength="6" autocomplete="new-password" />
+    </div>
+    <button type="submit" class="btn btn-red btn-block">Create account</button>
+  </form>
+
+  <div class="form-footer-link">
+    Already have an account? <a href="/login?next=<%= encodeURIComponent(next) %>">Log in</a>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,57 @@
+<%- include('../partials/admin-header', { pageTitle: 'VIP Codes', active: 'codes' }) %>
+
+<div class="admin-topbar">
+  <h1>VIP Codes</h1>
+  <form action="/admin/codes/generate" method="POST">
+    <button type="submit" class="btn btn-gold">+ Generate new code</button>
+  </form>
+</div>
+
+<% if (justGenerated) { %>
+  <div class="code-banner">
+    <div>
+      <div class="hint" style="margin-bottom:4px;">New code — copy this to the buyer on Telegram:</div>
+      <div class="code"><%= justGenerated %></div>
+    </div>
+    <span class="status-pill status-unused">Unused</span>
+  </div>
+<% } %>
+
+<table class="admin-table">
+  <thead>
+    <tr>
+      <th>Code</th>
+      <th>Status</th>
+      <th>Redeemed by</th>
+      <th>Redeemed on</th>
+      <th>Expires</th>
+      <th>Created</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (codes.length === 0) { %>
+      <tr class="admin-empty-row"><td colspan="6">No codes generated yet.</td></tr>
+    <% } else { %>
+      <% codes.forEach(code => { %>
+        <tr>
+          <td class="mono"><%= code.code %></td>
+          <td>
+            <% if (code.status === 'unused') { %>
+              <span class="status-pill status-unused">Unused</span>
+            <% } else if (code.status === 'active') { %>
+              <span class="status-pill status-active">Active</span>
+            <% } else { %>
+              <span class="status-pill status-expired">Expired</span>
+            <% } %>
+          </td>
+          <td><%= code.redeemed_by_username || '—' %></td>
+          <td class="mono"><%= code.redeemed_at ? code.redeemed_at.slice(0,10) : '—' %></td>
+          <td class="mono"><%= code.expires_at ? code.expires_at.slice(0,10) : '—' %></td>
+          <td class="mono"><%= code.created_at.slice(0,10) %></td>
+        </tr>
+      <% }) %>
+    <% } %>
+  </tbody>
+</table>
+
+<%- include('../partials/admin-footer') %>

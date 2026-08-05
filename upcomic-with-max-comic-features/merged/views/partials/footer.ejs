@@ -1,0 +1,40 @@
+  </main>
+
+  <footer class="site-footer">
+    <div class="container inner">
+      <span>&copy; <%= new Date().getFullYear() %> <%= siteName %> — <%= siteMotto %>. 18+ only.</span>
+      <span>Join our channel: <a class="tg" href="https://t.me/<%= telegramChannel.replace('@','') %>" target="_blank" rel="noopener"><%= telegramChannel %></a></span>
+    </div>
+  </footer>
+
+  <nav class="bottom-tabs">
+    <a href="/" class="<%= typeof active !== 'undefined' && active === 'home' ? 'active' : '' %>">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg>
+      Home
+    </a>
+    <a href="/#browse" class="<%= typeof active !== 'undefined' && active === 'browse' ? 'active' : '' %>">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg>
+      Comics
+    </a>
+    <a href="/#browse">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h7l-1 8 11-14h-7z"/></svg>
+      Updates
+    </a>
+    <a href="/vip" class="<%= typeof active !== 'undefined' && active === 'vip' ? 'active' : '' %>">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 18h20l-2-9-5 4-3-7-3 7-5-4z"/></svg>
+      VIP
+    </a>
+    <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+      <a href="/redeem">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+        Profile
+      </a>
+    <% } else { %>
+      <a href="/login">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+        Profile
+      </a>
+    <% } %>
+  </nav>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<%- include('../partials/admin-header', { pageTitle: 'Dashboard', active: 'dashboard' }) %>
+
+<div class="admin-topbar">
+  <h1>Dashboard</h1>
+</div>
+
+<div class="stat-grid">
+  <div class="stat-card"><div class="n"><%= comicCount %></div><div class="label">Comics</div></div>
+  <div class="stat-card"><div class="n"><%= chapterCount %></div><div class="label">Chapters</div></div>
+  <div class="stat-card"><div class="n"><%= categoryCount %></div><div class="label">Categories</div></div>
+  <div class="stat-card"><div class="n"><%= userCount %></div><div class="label">Users</div></div>
+  <div class="stat-card"><div class="n"><%= activeVipCount %></div><div class="label">Active VIP</div></div>
+  <div class="stat-card"><div class="n"><%= unusedCodes %></div><div class="label">Unused codes</div></div>
+</div>
+
+<div class="btn-row">
+  <a href="/admin/comics/new" class="btn btn-red">+ New Comic</a>
+  <a href="/admin/codes" class="btn btn-gold">Generate VIP Code</a>
+  <a href="/admin/categories" class="btn btn-ghost">Manage Categories</a>
+  <a href="/admin/users" class="btn btn-ghost">View Users</a>
+</div>
+
+<%- include('../partials/admin-footer') %>

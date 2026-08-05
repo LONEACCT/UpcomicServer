@@ -1,0 +1,180 @@
+<%- include('partials/header', { pageTitle: 'Home', active: 'home' }) %>
+
+<% if (featuredComics.length > 0) { %>
+<div class="hero" id="heroCarousel">
+  <% featuredComics.forEach((comic, i) => { %>
+    <div class="hero-slide <%= i === 0 ? 'active' : '' %>"
+         <% if (comic.cover_image) { %>style="background-image:url('<%= comic.cover_image %>');"<% } %>
+         data-slide-index="<%= i %>">
+      <div class="hero-content">
+        <span class="hero-tag">Featured Premium</span>
+        <h1><%= comic.title %></h1>
+        <div class="hero-meta">★ <%= comic.rating.toFixed(1) %> · <%= comic.chapter_count %> Chapter<%= comic.chapter_count === 1 ? '' : 's' %><% if (comic.category_names) { %> · <%= comic.category_names.split(', ')[0] %><% } %></div>
+        <% if (comic.description) { %><p class="blurb"><%= comic.description %></p><% } %>
+        <div class="hero-actions">
+          <a href="/comic/<%= comic.slug %>" class="btn btn-red">▶ Read Now</a>
+          <a href="/vip" class="btn btn-outline">👑 Become VIP</a>
+        </div>
+      </div>
+    </div>
+  <% }) %>
+  <% if (featuredComics.length > 1) { %>
+    <button class="hero-arrow prev" aria-label="Previous slide">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <button class="hero-arrow next" aria-label="Next slide">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <div class="hero-dots">
+      <% featuredComics.forEach((comic, i) => { %>
+        <button class="hero-dot <%= i === 0 ? 'active' : '' %>" data-dot-index="<%= i %>" aria-label="Slide <%= i + 1 %>"></button>
+      <% }) %>
+    </div>
+  <% } %>
+</div>
+<% } else { %>
+<div class="hero hero-empty">
+  <div>
+    <h3>No featured comics yet</h3>
+    <p>Mark a comic "Featured" in the admin dashboard to showcase it here.</p>
+  </div>
+</div>
+<% } %>
+
+<div class="container">
+
+  <% if (trendingComics.length > 0) { %>
+  <div class="section">
+    <div class="section-head"><h2>🔥 Trending Now</h2><a href="/#browse" class="view-all">View all →</a></div>
+    <div class="card-row">
+      <% trendingComics.forEach((comic, i) => { %>
+        <a href="/comic/<%= comic.slug %>" class="card">
+          <div class="cover">
+            <% if (i === 0) { %><span class="badge badge-hot">Hot</span><% } %>
+            <% if (comic.premium_chapter_count > 0) { %><span class="badge badge-vip">VIP</span><% } %>
+            <% if (comic.cover_image) { %>
+              <img src="<%= comic.cover_image %>" alt="<%= comic.title %>" loading="lazy" />
+            <% } else { %>
+              <div class="cover-placeholder">No cover</div>
+            <% } %>
+          </div>
+          <div class="info">
+            <h4><%= comic.title %></h4>
+            <div class="meta"><span>Ch. <%= comic.chapter_count %></span><span class="rating">★ <%= comic.rating.toFixed(1) %></span></div>
+          </div>
+        </a>
+      <% }) %>
+    </div>
+  </div>
+  <% } %>
+
+  <% if (latestChapters.length > 0) { %>
+  <div class="section">
+    <div class="section-head"><h2>⚡ Latest Updates</h2><a href="/#browse" class="view-all">View all →</a></div>
+    <div class="updates-grid">
+      <% latestChapters.forEach(ch => { %>
+        <a href="/comic/<%= ch.comic_slug %>/chapter/<%= ch.chapter_id %>" class="update-row">
+          <div class="thumb">
+            <% if (ch.cover_image) { %><img src="<%= ch.cover_image %>" alt="" /><% } %>
+          </div>
+          <div class="info">
+            <h4><%= ch.comic_title %> <span class="new-tag">NEW</span></h4>
+            <p>Chapter <%= ch.chapter_number %>: <%= ch.chapter_title %></p>
+            <p><%= formatRelativeTime(ch.created_at) %></p>
+          </div>
+        </a>
+      <% }) %>
+    </div>
+  </div>
+  <% } %>
+
+  <div id="browse"></div>
+  <div class="browse-controls">
+    <div class="sort-tabs">
+      <a href="?sort=latest<%= categorySlug ? '&category=' + categorySlug : '' %><%= search ? '&q=' + encodeURIComponent(search) : '' %>#browse" class="sort-tab <%= sort === 'latest' ? 'active' : '' %>">Latest</a>
+      <a href="?sort=popular<%= categorySlug ? '&category=' + categorySlug : '' %><%= search ? '&q=' + encodeURIComponent(search) : '' %>#browse" class="sort-tab <%= sort === 'popular' ? 'active' : '' %>">Popular</a>
+      <a href="?sort=trending<%= categorySlug ? '&category=' + categorySlug : '' %><%= search ? '&q=' + encodeURIComponent(search) : '' %>#browse" class="sort-tab <%= sort === 'trending' ? 'active' : '' %>">Trending</a>
+    </div>
+    <form class="filter-row" method="GET" action="/#browse">
+      <input type="hidden" name="sort" value="<%= sort %>" />
+      <select name="category" class="category-select" onchange="this.form.submit()">
+        <option value="">All Genres</option>
+        <% categories.forEach(cat => { %>
+          <option value="<%= cat.slug %>" <%= categorySlug === cat.slug ? 'selected' : '' %>><%= cat.name %></option>
+        <% }) %>
+      </select>
+      <div class="search-box">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" name="q" placeholder="Search titles..." value="<%= search %>" />
+      </div>
+      <button type="submit" class="btn btn-ghost btn-small">Filter</button>
+    </form>
+  </div>
+
+  <div class="section-head">
+    <h2>All Comics</h2>
+    <span class="hint"><%= comics.length %> result<%= comics.length === 1 ? '' : 's' %></span>
+  </div>
+
+  <% if (comics.length === 0) { %>
+    <div class="empty-state">
+      <h3>No comics found</h3>
+      <p>Try a different search or genre.</p>
+    </div>
+  <% } else { %>
+    <div class="comic-grid">
+      <% comics.forEach(comic => { %>
+        <a href="/comic/<%= comic.slug %>" class="card">
+          <div class="cover">
+            <% if (comic.cover_image) { %>
+              <img src="<%= comic.cover_image %>" alt="<%= comic.title %>" loading="lazy" />
+            <% } else { %>
+              <div class="cover-placeholder">No cover</div>
+            <% } %>
+          </div>
+          <div class="info">
+            <h4><%= comic.title %></h4>
+            <div class="meta"><span>Ch. <%= comic.chapter_count %></span><span class="rating">★ <%= comic.rating.toFixed(1) %></span></div>
+          </div>
+        </a>
+      <% }) %>
+    </div>
+  <% } %>
+
+  <div class="vip-section">
+    <div class="left">
+      <h2>👑 Become VIP</h2>
+      <p>Unlimited access to every premium chapter. No ads, no waiting.</p>
+    </div>
+    <div class="price-card">
+      <div class="label">Monthly Access</div>
+      <div class="amount">₦<%= vipPrice %> <span>/ <%= vipPricePeriod %></span></div>
+      <a href="/vip" class="btn btn-gold btn-block" style="margin-top:14px;">Join VIP</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  var slides = document.querySelectorAll('.hero-slide');
+  var dots = document.querySelectorAll('.hero-dot');
+  var prevBtn = document.querySelector('.hero-arrow.prev');
+  var nextBtn = document.querySelector('.hero-arrow.next');
+  if (slides.length <= 1) return;
+  var current = 0;
+  function show(i) {
+    current = (i + slides.length) % slides.length;
+    slides.forEach(function (s, idx) { s.classList.toggle('active', idx === current); });
+    dots.forEach(function (d, idx) { d.classList.toggle('active', idx === current); });
+  }
+  dots.forEach(function (d) {
+    d.addEventListener('click', function () { show(parseInt(d.dataset.dotIndex, 10)); });
+  });
+  if (prevBtn) prevBtn.addEventListener('click', function () { show(current - 1); });
+  if (nextBtn) nextBtn.addEventListener('click', function () { show(current + 1); });
+  setInterval(function () { show(current + 1); }, 6000);
+})();
+</script>
+
+<%- include('partials/footer') %>

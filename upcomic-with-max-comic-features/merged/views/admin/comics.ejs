@@ -1,0 +1,53 @@
+<%- include('../partials/admin-header', { pageTitle: 'Comics', active: 'comics' }) %>
+
+<div class="admin-topbar">
+  <h1>Comics</h1>
+  <a href="/admin/comics/new" class="btn btn-red">+ New Comic</a>
+</div>
+
+<table class="admin-table">
+  <thead>
+    <tr>
+      <th>Cover</th>
+      <th>Title</th>
+      <th>Rating</th>
+      <th>Views</th>
+      <th>Flags</th>
+      <th>Chapters</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (comics.length === 0) { %>
+      <tr class="admin-empty-row"><td colspan="7">No comics yet — create your first one.</td></tr>
+    <% } else { %>
+      <% comics.forEach(comic => { %>
+        <tr>
+          <td>
+            <% if (comic.cover_image) { %>
+              <img src="<%= comic.cover_image %>" class="thumb-40" alt="" />
+            <% } else { %>—<% } %>
+          </td>
+          <td><%= comic.title %></td>
+          <td class="mono">★ <%= comic.rating.toFixed(1) %></td>
+          <td class="mono"><%= formatCompactNumber(comic.views) %></td>
+          <td>
+            <% if (comic.is_featured) { %><span class="status-pill status-active">Featured</span><% } %>
+            <% if (comic.is_trending) { %><span class="status-pill status-unused">Trending</span><% } %>
+          </td>
+          <td><a href="/admin/comics/<%= comic.id %>/chapters" class="btn btn-ghost btn-small">Manage chapters</a></td>
+          <td>
+            <div class="btn-row">
+              <a href="/admin/comics/<%= comic.id %>/edit" class="btn btn-ghost btn-small">Edit</a>
+              <form action="/admin/comics/<%= comic.id %>/delete" method="POST" onsubmit="return confirm('Delete this comic and all its chapters/pages? This cannot be undone.');">
+                <button type="submit" class="btn btn-ghost btn-small" style="color:var(--danger);">Delete</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+      <% }) %>
+    <% } %>
+  </tbody>
+</table>
+
+<%- include('../partials/admin-footer') %>

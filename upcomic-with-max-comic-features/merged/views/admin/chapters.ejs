@@ -1,0 +1,68 @@
+<%- include('../partials/admin-header', { pageTitle: comic.title + ' — Chapters', active: 'comics' }) %>
+
+<div class="admin-topbar">
+  <div>
+    <h1><%= comic.title %></h1>
+    <p class="hint" style="margin-top:4px;">Chapters</p>
+  </div>
+  <div class="btn-row">
+    <a href="/admin/comics" class="btn btn-ghost">← Back to comics</a>
+    <a href="/admin/comics/<%= comic.id %>/chapters/bulk-zip" class="btn btn-ghost">Bulk ZIP upload</a>
+    <a href="/admin/comics/<%= comic.id %>/chapters/new" class="btn btn-red">+ New Chapter</a>
+  </div>
+</div>
+
+<% if (totalCount > chapters.length) { %>
+  <p class="hint" style="margin-bottom:12px;">Showing the <%= chapters.length %> most recently uploaded chapters (<%= totalCount %> total).</p>
+<% } %>
+
+<table class="admin-table">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Title</th>
+      <th>Type</th>
+      <th>Status</th>
+      <th>Created</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (chapters.length === 0) { %>
+      <tr class="admin-empty-row"><td colspan="6">No chapters yet — add the first one.</td></tr>
+    <% } else { %>
+      <% chapters.forEach(chapter => { %>
+        <tr>
+          <td class="mono"><%= chapter.chapter_number %></td>
+          <td><%= chapter.title %></td>
+          <td>
+            <% if (chapter.is_premium) { %>
+              <span class="badge badge-vip">★ VIP</span>
+            <% } else { %>
+              <span class="badge badge-free">Free</span>
+            <% } %>
+          </td>
+          <td>
+            <% if (chapter.publish_at && new Date(chapter.publish_at) > new Date()) { %>
+              <span class="badge">Scheduled — <%= formatRelativeTime(chapter.publish_at) %></span>
+            <% } else { %>
+              <span class="badge">Live</span>
+            <% } %>
+          </td>
+          <td class="mono"><%= chapter.created_at %></td>
+          <td>
+            <div class="btn-row">
+              <a href="/admin/comics/<%= comic.id %>/chapters/<%= chapter.id %>/edit" class="btn btn-ghost btn-small">Edit</a>
+              <a href="/admin/comics/<%= comic.id %>/chapters/<%= chapter.id %>/add-pages" class="btn btn-ghost btn-small">Add pages</a>
+              <form action="/admin/comics/<%= comic.id %>/chapters/<%= chapter.id %>/delete" method="POST" onsubmit="return confirm('Delete this chapter and all its pages? This cannot be undone.');">
+                <button type="submit" class="btn btn-ghost btn-small" style="color:var(--danger);">Delete</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+      <% }) %>
+    <% } %>
+  </tbody>
+</table>
+
+<%- include('../partials/admin-footer') %>

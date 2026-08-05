@@ -1,0 +1,42 @@
+<%- include('../partials/admin-header', { pageTitle: 'Users', active: 'users' }) %>
+
+<div class="admin-topbar">
+  <h1>Users</h1>
+</div>
+
+<table class="admin-table">
+  <thead>
+    <tr>
+      <th>Username</th>
+      <th>VIP status</th>
+      <th>VIP expires</th>
+      <th>Joined</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (users.length === 0) { %>
+      <tr class="admin-empty-row"><td colspan="4">No users yet.</td></tr>
+    <% } else { %>
+      <% users.forEach(user => {
+        const isVip = user.vip_expires_at && new Date(user.vip_expires_at) > new Date();
+      %>
+        <tr>
+          <td><%= user.username %></td>
+          <td>
+            <% if (isVip) { %>
+              <span class="status-pill status-active">VIP</span>
+            <% } else if (user.vip_expires_at) { %>
+              <span class="status-pill status-expired">Expired</span>
+            <% } else { %>
+              <span class="status-pill status-unused">Never VIP</span>
+            <% } %>
+          </td>
+          <td class="mono"><%= user.vip_expires_at ? user.vip_expires_at.slice(0,10) : '—' %></td>
+          <td class="mono"><%= user.created_at.slice(0,10) %></td>
+        </tr>
+      <% }) %>
+    <% } %>
+  </tbody>
+</table>
+
+<%- include('../partials/admin-footer') %>

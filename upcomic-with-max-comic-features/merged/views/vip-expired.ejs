@@ -1,0 +1,23 @@
+<%- include('partials/header', { pageTitle: 'VIP Access Expired', active: 'vip' }) %>
+
+<div class="container vip-page">
+  <div class="vip-hero" style="max-width:480px;">
+    <h1 style="font-size:26px;"><%= everHadVip ? 'Your VIP access has expired' : 'This chapter is VIP-only' %></h1>
+    <p>
+      <% if (everHadVip) { %>
+        Your 30 days of full access has run out. Message <a href="https://t.me/<%= telegramAdmin.replace('@','') %>" target="_blank" rel="noopener" class="tg-inline"><%= telegramAdmin %></a> to renew and get a new code.
+      <% } else { %>
+        Message <a href="https://t.me/<%= telegramAdmin.replace('@','') %>" target="_blank" rel="noopener" class="tg-inline"><%= telegramAdmin %></a> to get an access code and unlock every premium chapter.
+      <% } %>
+    </p>
+    <div class="hero-actions" style="justify-content:center;margin-top:20px;">
+      <a href="https://t.me/<%= telegramAdmin.replace('@','') %>" target="_blank" rel="noopener" class="btn btn-gold">Message on Telegram</a>
+      <a href="/redeem" class="btn btn-outline">Enter a code</a>
+    </div>
+    <div style="margin-top:14px;">
+      <a href="/vip" class="btn btn-ghost">See VIP details</a>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

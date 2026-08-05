@@ -1,0 +1,27 @@
+<%- include('partials/header', { pageTitle: 'Redeem code' }) %>
+
+<div class="form-shell">
+  <h1>Enter your access code</h1>
+  <p class="sub">Your VIP access starts the moment you redeem it, and lasts 30 days.</p>
+
+  <% if (error) { %><div class="form-error"><%= error %></div><% } %>
+  <% if (success) { %>
+    <div class="form-success">
+      You're VIP! Full access unlocked until <strong><%= new Date(success).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></strong>.
+    </div>
+    <a href="/" class="btn btn-gold btn-block">Start reading →</a>
+  <% } else { %>
+    <form action="/redeem" method="POST">
+      <div class="field">
+        <label for="code">Access code</label>
+        <input type="text" id="code" name="code" required placeholder="UP-XXXX-XXXX" style="text-transform:uppercase; font-family: var(--font-mono); letter-spacing: 0.05em;" />
+      </div>
+      <button type="submit" class="btn btn-gold btn-block">Unlock VIP</button>
+    </form>
+    <div class="form-footer-link">
+      Don't have a code yet? <a href="/vip">See how to get VIP access</a>
+    </div>
+  <% } %>
+</div>
+
+<%- include('partials/footer') %>

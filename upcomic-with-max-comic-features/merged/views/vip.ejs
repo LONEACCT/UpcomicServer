@@ -1,0 +1,65 @@
+<%- include('partials/header', { pageTitle: 'VIP Access', active: 'vip' }) %>
+
+<div class="container vip-page">
+  <div class="vip-hero">
+    <h1>Unlock Everything</h1>
+    <h1 style="color:var(--gold-bright);">Become VIP</h1>
+    <p>Unlimited access to every premium chapter. No ads, no waiting — just the story.</p>
+  </div>
+
+  <div class="vip-layout">
+    <div class="benefit-list">
+      <div class="benefit-item">
+        <div class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div>
+        <div class="text"><strong>Unlimited Reading</strong><span>Every chapter, every series, no limits.</span></div>
+      </div>
+      <div class="benefit-item">
+        <div class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.9" y1="4.9" x2="19.1" y2="19.1"/></svg></div>
+        <div class="text"><strong>No Ads Distraction</strong><span>A clean, uninterrupted reading experience.</span></div>
+      </div>
+      <div class="benefit-item">
+        <div class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h7l-1 8 11-14h-7z"/></svg></div>
+        <div class="text"><strong>Early Access</strong><span>Read new chapters the moment they drop.</span></div>
+      </div>
+      <div class="benefit-item">
+        <div class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>
+        <div class="text"><strong>HD Quality Images</strong><span>Every page in full, uncompressed clarity.</span></div>
+      </div>
+      <div class="benefit-item">
+        <div class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 10-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg></div>
+        <div class="text"><strong>Support the Creator</strong><span>Your subscription funds new chapters.</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="vip-price-panel">
+        <div class="label">Monthly Access</div>
+        <div class="amount">₦<%= vipPrice %> <span>/ <%= vipPricePeriod %></span></div>
+        <a href="https://t.me/<%= telegramAdmin.replace('@','') %>" target="_blank" rel="noopener" class="btn btn-gold btn-block">Join VIP</a>
+        <div style="margin-top:10px;">
+          <a href="/redeem" class="btn btn-ghost btn-block">Have a code already?</a>
+        </div>
+      </div>
+
+      <div class="steps-panel">
+        <h3>How to Get VIP Access</h3>
+        <div class="steps-grid">
+          <div class="step-item"><div class="num">1</div><p>Send payment to our account</p></div>
+          <div class="step-item"><div class="num">2</div><p>Send payment proof on Telegram</p></div>
+          <div class="step-item"><div class="num">3</div><p>Receive your VIP access code</p></div>
+          <div class="step-item"><div class="num">4</div><p>Enjoy unlimited premium content</p></div>
+        </div>
+      </div>
+
+      <div class="tg-help-box">
+        <p>Need help? Contact us on Telegram</p>
+        <a href="https://t.me/<%= telegramAdmin.replace('@','') %>" target="_blank" rel="noopener" class="tg-help-btn">
+          <svg width="16" height="16" viewBox="0 0 240 240" fill="currentColor"><path d="M120 0a120 120 0 1 0 0 240 120 120 0 0 0 0-240Zm54.6 82.1-18.4 86.7c-1.4 6.2-5 7.7-10.2 4.8l-28.2-20.8-13.6 13.1c-1.5 1.5-2.8 2.8-5.7 2.8l2-28.7 52.3-47.2c2.3-2 -0.5-3.1-3.5-1.1l-64.6 40.7-27.8-8.7c-6.1-1.9-6.2-6.1 1.3-9l108.6-41.9c5-1.9 9.5 1.2 7.8 9.3Z"/></svg>
+          <%= telegramAdmin %>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

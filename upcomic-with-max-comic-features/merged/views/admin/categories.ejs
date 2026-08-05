@@ -1,0 +1,32 @@
+<%- include('../partials/admin-header', { pageTitle: 'Genres', active: 'categories' }) %>
+
+<div class="admin-topbar">
+  <h1>Genres</h1>
+</div>
+
+<form action="/admin/categories/new" method="POST" class="inline-form" style="margin-bottom:28px;">
+  <input type="text" name="name" placeholder="e.g. Isekai, Office, Mature..." required style="flex:1;" />
+  <button type="submit" class="btn btn-red">+ Add genre</button>
+</form>
+
+<% if (categories.length === 0) { %>
+  <div class="empty-state">
+    <h3>No categories yet</h3>
+    <p>Add your first one above.</p>
+  </div>
+<% } else { %>
+  <div class="category-tag-row">
+    <% categories.forEach(cat => { %>
+      <div class="category-tag">
+        <span><%= cat.name %></span>
+        <span class="count"><%= cat.comic_count %></span>
+        <form action="/admin/categories/<%= cat.id %>/delete" method="POST" onsubmit="return confirm('Delete category \'<%= cat.name %>\'? It will be removed from any comics using it.');" style="display:inline;">
+          <button type="submit" aria-label="Delete <%= cat.name %>">✕</button>
+        </form>
+      </div>
+    <% }) %>
+  </div>
+  <p class="hint" style="margin-top:18px;">The number next to each category shows how many comics use it. Deleting a category just un-tags those comics — it doesn't delete the comics.</p>
+<% } %>
+
+<%- include('../partials/admin-footer') %>
