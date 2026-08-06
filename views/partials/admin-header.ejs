@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' — Admin' : 'Admin' %> — <%= siteName %></title>
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Oswald:wght@500;600;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css" />
@@ -12,9 +15,10 @@
   <div class="admin-shell">
     <aside class="admin-sidebar">
       <div class="brand-mini">
-        <img src="/icons/logo.png" alt="UPCOMIC" style="height:28px;width:auto;" />
+        <img src="/icons/logo.png" alt="<%= siteName %>" style="height:28px;width:auto;" />
       </div>
       <a href="/admin" class="admin-nav-link <%= active === 'dashboard' ? 'active' : '' %>">Dashboard</a>
+      <a href="/admin/analytics" class="admin-nav-link <%= active === 'analytics' ? 'active' : '' %>">Analytics</a>
       <a href="/admin/comics" class="admin-nav-link <%= active === 'comics' ? 'active' : '' %>">Comics</a>
       <a href="/admin/categories" class="admin-nav-link <%= active === 'categories' ? 'active' : '' %>">Genres</a>
       <a href="/admin/codes" class="admin-nav-link <%= active === 'codes' ? 'active' : '' %>">VIP Codes</a>
