@@ -6,7 +6,7 @@ const { requireAdmin } = require('../middleware/auth');
 const { uploadCover, uploadPages, uploadBulkZips, uploadChapterMedia, pagesDir, coversDir } = require('../upload');
 const { generateCode, slugify } = require('../utils');
 const { extractZipImages, chapterNumberFromFilename } = require('../lib/zip-utils');
-const { notifyNewChapter, sendTestTelegramMessage } = require('../lib/notify');
+const { notifyNewChapter, notifyBulkChapters, sendTestTelegramMessage } = require('../lib/notify');
 const { getSetting, setSetting, getBoolSetting } = require('../lib/settings');
 let sharp = null;
 try { sharp = require('sharp'); } catch (e) { /* optional */ }
@@ -497,6 +497,7 @@ router.post('/comics/:comicId/chapters/bulk-zip', uploadBulkZips.array('zips', 5
   );
   const insertPage = db.prepare('INSERT INTO pages (chapter_id, image_path, page_order) VALUES (?, ?, ?)');
   const newChapters = [];
+  const newChapterNumbers = [];
 
   for (const file of files) {
     const chapterNumber = chapterNumberFromFilename(file.originalname);
@@ -513,16 +514,16 @@ router.post('/comics/:comicId/chapters/bulk-zip', uploadBulkZips.array('zips', 5
       const filenames = extractZipImages(file.path, pagesDir);
       filenames.forEach((filename, i) => insertPage.run(chapterId, filename, i + 1));
       newChapters.push(chapterId);
+      newChapterNumbers.push(chapterNumber || 0);
     } finally {
       fs.unlink(file.path, () => {});
     }
   }
 
-  if (!scheduled) {
-    for (const chapterId of newChapters) {
-      const chapter = db.prepare('SELECT * FROM chapters WHERE id = ?').get(chapterId);
-      notifyNewChapter(comic, chapter).catch((e) => console.log('Notify failed:', e.message));
-    }
+  if (!scheduled && newChapterNumbers.length) {
+    // One combined notification for the whole batch — not one per chapter,
+    // which would otherwise flood Telegram/push on a big bulk upload.
+    notifyBulkChapters(comic, newChapterNumbers).catch((e) => console.log('Bulk notify failed:', e.message));
   }
 
   res.redirect(`/admin/comics/${comic.id}/chapters`);

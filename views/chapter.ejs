@@ -1,0 +1,112 @@
+<%- include('partials/header', { pageTitle: chapter.title, active: 'browse' }) %>
+
+<div class="container">
+  <div class="reader-bar">
+    <a href="/comic/<%= comic.slug %>" class="back-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      <%= comic.title %>
+    </a>
+    <div class="meta">
+      Chapter <%= chapter.chapter_number %> · <%= pages.length %> pages
+      <% if (chapter.is_premium) { %> · <span class="badge badge-vip-tag">VIP</span><% } %>
+    </div>
+  </div>
+
+  <h1 style="font-size:20px;margin-top:4px;"><%= chapter.title %></h1>
+
+  <% if (pages.length > 0) { %>
+    <div class="btn-row" style="margin:10px 0 4px;">
+      <a href="/comic/<%= comic.slug %>/chapter/<%= chapter.id %>/download" class="btn btn-ghost btn-small">⬇ Download Chapter</a>
+    </div>
+  <% } %>
+
+  <% if (pages.length === 0) { %>
+    <div class="empty-state">
+      <h3>No pages uploaded for this chapter yet</h3>
+    </div>
+  <% } else { %>
+    <div class="reader-pages">
+      <% pages.forEach((page, i) => { %>
+        <img src="/media/page/<%= page.id %>" alt="Page <%= i + 1 %>" loading="lazy" />
+      <% }) %>
+    </div>
+  <% } %>
+
+  <div class="reader-nav">
+    <% if (prevChapter) { %>
+      <a href="/comic/<%= comic.slug %>/chapter/<%= prevChapter.id %>" class="btn btn-ghost">← Previous chapter</a>
+    <% } else { %><span></span><% } %>
+    <% if (nextChapter) { %>
+      <a href="/comic/<%= comic.slug %>/chapter/<%= nextChapter.id %>" class="btn btn-ghost">Next chapter →</a>
+    <% } %>
+  </div>
+
+  <div class="comments-section" style="margin-top:32px;max-width:640px;">
+    <h2 style="font-size:16px;">Comments (<%= comments.length %>)</h2>
+
+    <% if (currentUser) { %>
+      <form action="/comic/<%= comic.slug %>/chapter/<%= chapter.id %>/comments" method="POST" style="margin:12px 0;">
+        <textarea name="body" required maxlength="2000" placeholder="Leave a comment..." style="width:100%;min-height:70px;padding:10px;border-radius:8px;"></textarea>
+        <button type="submit" class="btn btn-red btn-small" style="margin-top:6px;">Post</button>
+      </form>
+    <% } else { %>
+      <p class="hint"><a href="/login?next=<%= encodeURIComponent('/comic/' + comic.slug + '/chapter/' + chapter.id) %>">Log in</a> to comment.</p>
+    <% } %>
+
+    <% if (comments.length === 0) { %>
+      <p class="hint">No comments yet — be the first.</p>
+    <% } else { %>
+      <% comments.forEach(c => { %>
+        <div class="comment-row" style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.08);">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <strong><%= c.username %></strong>
+            <span class="hint mono"><%= formatRelativeTime(c.created_at) %></span>
+          </div>
+          <p style="margin:4px 0;"><%= c.body %></p>
+          <% if (currentUser) { %>
+            <% if (reportedCommentIds.includes(c.id)) { %>
+              <span class="hint">Reported</span>
+            <% } else { %>
+              <form action="/comic/<%= comic.slug %>/chapter/<%= chapter.id %>/comments/<%= c.id %>/report" method="POST">
+                <button type="submit" class="btn btn-ghost btn-small">Report</button>
+              </form>
+            <% } %>
+          <% } %>
+        </div>
+      <% }) %>
+    <% } %>
+  </div>
+</div>
+
+<% if (currentUser && vapidPublicKey) { %>
+<script>
+  // Ask for a web-push subscription so this reader gets notified about new chapters
+  (function () {
+    function urlBase64ToUint8Array(base64String) {
+      const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+      const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+      const rawData = atob(base64);
+      return Uint8Array.from([...rawData].map((c) => c.charCodeAt(0)));
+    }
+    if ('serviceWorker' in navigator && 'PushManager' in window) {
+      navigator.serviceWorker.register('/sw.js').then(async (reg) => {
+        const existing = await reg.pushManager.getSubscription();
+        if (existing) return;
+        try {
+          const sub = await reg.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array('<%= vapidPublicKey %>'),
+          });
+          fetch('/push/subscribe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(sub),
+          });
+        } catch (e) { /* user dismissed the permission prompt */ }
+      });
+    }
+  })();
+</script>
+<% } %>
+
+<%- include('partials/footer') %>
