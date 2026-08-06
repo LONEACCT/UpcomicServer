@@ -29,4 +29,89 @@
       </form>
     </aside>
     <main class="admin-main">
+array('pages', 200),
+  (req, res) => {
+    const chapter = db
+      .prepare('SELECT * FROM chapters WHERE id = ? AND comic_id = ?')
+      .get(req.params.chapterId, req.params.comicId);
+    if (!chapter) return res.redirect(`/admin/comics/${req.params.comicId}/chapters`);
 
+    const maxOrder =
+      db.prepare('SELECT MAX(page_order) AS m FROM pages WHERE chapter_id = ?').get(chapter.id)
+        .m || 0;
+    const insertPage = db.prepare(
+      'INSERT INTO pages (chapter_id, image_path, page_order) VALUES (?, ?, ?)'
+    );
+    (req.files || []).forEach((file, i) => {
+      insertPage.run(chapter.id, file.filename, maxOrder + i + 1);
+    });
+
+    res.redirect(`/admin/comics/${req.params.comicId}/chapters`);
+  }
+);
+
+// ---------- VIP codes ----------
+
+router.get('/codes', (req, res) => {
+  db.prepare(
+    "UPDATE codes SET status = 'expired' WHERE status = 'active' AND expires_at < datetime('now')"
+  ).run();
+  const codes = db
+    .prepare(
+      `SELECT codes.*, users.username AS redeemed_by_username
+       FROM codes LEFT JOIN users ON codes.redeemed_by = users.id
+       ORDER BY codes.created_at DESC`
+    )
+    .all();
+  res.render('admin/codes', { codes, justGenerated: req.query.new || null });
+});
+
+router.post('/codes/generate', (req, res) => {
+  let code = generateCode();
+  // Extremely unlikely to collide, but guard anyway
+  while (db.prepare('SELECT id FROM codes WHERE code = ?').get(code)) {
+    code = generateCode();
+  }
+  db.prepare('INSERT INTO codes (code) VALUES (?)').run(code);
+  res.redirect(`/admin/codes?new=${encodeURIComponent(code)}`);
+});
+
+// ---------- Reported comments ----------
+
+router.get('/comments/reported', (req, res) => {
+  const reported = db
+    .prepare(
+      `SELECT comments.*, users.username, COUNT(comment_reports.id) AS report_count,
+              chapters.chapter_number, chapters.title AS chapter_title,
+              comics.title AS comic_title, comics.slug AS comic_slug, comics.id AS comic_id
+       FROM comment_reports
+       JOIN comments ON comments.id = comment_reports.comment_id
+       JOIN users ON users.id = comments.user_id
+       JOIN chapters ON chapters.id = comments.chapter_id
+       JOIN comics ON comics.id = chapters.comic_id
+       GROUP BY comments.id
+       ORDER BY report_count DESC, comments.created_at DESC`
+    )
+    .all();
+  res.render('admin/reported-comments', { reported });
+});
+
+router.post('/comments/:id/dismiss', (req, res) => {
+  db.prepare('DELETE FROM comment_reports WHERE comment_id = ?').run(req.params.id);
+  res.redirect('/admin/comments/reported');
+});
+
+router.post('/comments/:id/delete', (req, res) => {
+  db.prepare('DELETE FROM comments WHERE id = ?').run(req.params.id); // cascades comment_reports
+  res.redirect('/admin/comments/reported');
+});
+
+// ---------- Users ----------
+
+router.get('/users', (req, res) => {
+  const users = db.prepare('SELECT * FROM users ORDER BY created_at DESC').all();
+  res.render('admin/users', { users });
+});
+
+module.exports = router;
+ENDOFFILE
