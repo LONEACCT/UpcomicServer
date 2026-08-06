@@ -13,13 +13,13 @@
   </div>
 <% } %>
 
-<h2 style="font-size:16px;margin-bottom:12px;">Telegram autopost</h2>
-<p class="hint" style="margin-bottom:16px;">
-  When a chapter is published (or a scheduled one goes live), a message is posted automatically to this channel.
-  Get a bot token from <a href="https://t.me/BotFather" target="_blank" rel="noopener">@BotFather</a>, then add the bot as an admin of your channel.
-</p>
-
 <form action="/admin/settings" method="POST" style="max-width:520px;">
+
+  <h2 style="font-size:16px;margin-bottom:12px;">Telegram autopost</h2>
+  <p class="hint" style="margin-bottom:16px;">
+    When a chapter is published (or a scheduled one goes live), a message is posted automatically to this channel.
+    Get a bot token from <a href="https://t.me/BotFather" target="_blank" rel="noopener">@BotFather</a>, then add the bot as an admin of your channel.
+  </p>
   <div class="field">
     <label>Bot token</label>
     <input type="text" name="telegram_bot_token" value="<%= telegramBotToken %>" placeholder="123456:ABC-DEF..." />
@@ -34,6 +34,22 @@
       <label for="autopost">Autopost new chapters to this channel</label>
     </div>
   </div>
+
+  <h2 style="font-size:16px;margin:28px 0 12px;">Page watermark</h2>
+  <p class="hint" style="margin-bottom:16px;">
+    Stamps this text onto every page image when a ZIP is uploaded (single chapter or bulk) — helps deter reposting on other sites.
+  </p>
+  <div class="field">
+    <div class="checkbox-row">
+      <input type="checkbox" id="watermark" name="watermark_enabled" value="1" <%= watermarkEnabled ? 'checked' : '' %> />
+      <label for="watermark">Watermark pages on ZIP upload</label>
+    </div>
+  </div>
+  <div class="field">
+    <label>Watermark text</label>
+    <input type="text" name="watermark_text" value="<%= watermarkText %>" placeholder="UPCOMIC" />
+  </div>
+
   <div class="btn-row">
     <button type="submit" class="btn btn-red">Save Settings</button>
   </div>

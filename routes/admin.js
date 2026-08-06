@@ -6,6 +6,7 @@ const { requireAdmin } = require('../middleware/auth');
 const { uploadCover, uploadPages, uploadBulkZips, uploadChapterMedia, pagesDir, coversDir } = require('../upload');
 const { generateCode, slugify } = require('../utils');
 const { extractZipImages, chapterNumberFromFilename } = require('../lib/zip-utils');
+const { watermarkPages } = require('../lib/watermark');
 const { notifyNewChapter, notifyBulkChapters, sendTestTelegramMessage } = require('../lib/notify');
 const { getSetting, setSetting, getBoolSetting } = require('../lib/settings');
 let sharp = null;
@@ -183,16 +184,20 @@ router.get('/settings', (req, res) => {
     telegramBotToken: getSetting('telegram_bot_token', 'TELEGRAM_BOT_TOKEN'),
     telegramChannelId: getSetting('telegram_channel_id', 'TELEGRAM_CHANNEL_ID', process.env.TELEGRAM_CHANNEL || ''),
     autopostEnabled: getBoolSetting('telegram_autopost_enabled', null, true),
+    watermarkEnabled: getBoolSetting('watermark_enabled', null, true),
+    watermarkText: getSetting('watermark_text', 'SITE_NAME', 'UPCOMIC'),
     saved: req.query.saved || null,
     testResult: null,
   });
 });
 
 router.post('/settings', (req, res) => {
-  const { telegram_bot_token, telegram_channel_id, telegram_autopost_enabled } = req.body;
+  const { telegram_bot_token, telegram_channel_id, telegram_autopost_enabled, watermark_enabled, watermark_text } = req.body;
   setSetting('telegram_bot_token', (telegram_bot_token || '').trim());
   setSetting('telegram_channel_id', (telegram_channel_id || '').trim());
   setSetting('telegram_autopost_enabled', telegram_autopost_enabled ? '1' : '0');
+  setSetting('watermark_enabled', watermark_enabled ? '1' : '0');
+  setSetting('watermark_text', (watermark_text || '').trim());
   res.redirect('/admin/settings?saved=1');
 });
 
@@ -202,6 +207,8 @@ router.post('/settings/test-telegram', async (req, res) => {
     telegramBotToken: getSetting('telegram_bot_token', 'TELEGRAM_BOT_TOKEN'),
     telegramChannelId: getSetting('telegram_channel_id', 'TELEGRAM_CHANNEL_ID', process.env.TELEGRAM_CHANNEL || ''),
     autopostEnabled: getBoolSetting('telegram_autopost_enabled', null, true),
+    watermarkEnabled: getBoolSetting('watermark_enabled', null, true),
+    watermarkText: getSetting('watermark_text', 'SITE_NAME', 'UPCOMIC'),
     saved: null,
     testResult,
   });
@@ -420,6 +427,7 @@ router.post('/comics/:comicId/chapters/new', uploadChapterMedia, async (req, res
     try {
       const filenames = extractZipImages(zipFile.path, pagesDir);
       filenames.forEach((filename, i) => insertPage.run(chapterId, filename, manualFiles.length + i + 1));
+      await watermarkPages(pagesDir, filenames);
     } finally {
       fs.unlink(zipFile.path, () => {});
     }
@@ -513,6 +521,7 @@ router.post('/comics/:comicId/chapters/bulk-zip', uploadBulkZips.array('zips', 5
       const chapterId = result.lastInsertRowid;
       const filenames = extractZipImages(file.path, pagesDir);
       filenames.forEach((filename, i) => insertPage.run(chapterId, filename, i + 1));
+      await watermarkPages(pagesDir, filenames);
       newChapters.push(chapterId);
       newChapterNumbers.push(chapterNumber || 0);
     } finally {
