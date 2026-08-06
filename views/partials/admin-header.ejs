@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' — Admin' : 'Admin' %> — <%= siteName %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Oswald:wght@500;600;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <div class="admin-shell">
+    <aside class="admin-sidebar">
+      <div class="brand-mini">
+        <img src="/icons/logo.png" alt="UPCOMIC" style="height:28px;width:auto;" />
+      </div>
+      <a href="/admin" class="admin-nav-link <%= active === 'dashboard' ? 'active' : '' %>">Dashboard</a>
+      <a href="/admin/comics" class="admin-nav-link <%= active === 'comics' ? 'active' : '' %>">Comics</a>
+      <a href="/admin/categories" class="admin-nav-link <%= active === 'categories' ? 'active' : '' %>">Genres</a>
+      <a href="/admin/codes" class="admin-nav-link <%= active === 'codes' ? 'active' : '' %>">VIP Codes</a>
+      <a href="/admin/users" class="admin-nav-link <%= active === 'users' ? 'active' : '' %>">Users</a>
+      <a href="/admin/comments/reported" class="admin-nav-link <%= active === 'reported-comments' ? 'active' : '' %>">Reported Comments</a>
+      <a href="/" target="_blank" class="admin-nav-link">View site ↗</a>
+      <form action="/admin/logout" method="POST">
+        <button type="submit" class="admin-nav-link" style="background:none;border:none;width:100%;text-align:left;cursor:pointer;font-family:inherit;">Log out</button>
+      </form>
+    </aside>
+    <main class="admin-main">
+
