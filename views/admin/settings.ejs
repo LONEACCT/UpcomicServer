@@ -1,0 +1,46 @@
+<%- include('../partials/admin-header', { pageTitle: 'Settings', active: 'settings' }) %>
+
+<div class="admin-topbar">
+  <h1>Settings</h1>
+</div>
+
+<% if (saved) { %>
+  <div class="hint" style="color:var(--gold-bright);margin-bottom:16px;">Settings saved.</div>
+<% } %>
+<% if (testResult) { %>
+  <div class="hint" style="color:<%= testResult.ok ? 'var(--gold-bright)' : 'var(--danger)' %>;margin-bottom:16px;">
+    <%= testResult.ok ? '✅ Test message sent — check your Telegram channel.' : '❌ ' + testResult.error %>
+  </div>
+<% } %>
+
+<h2 style="font-size:16px;margin-bottom:12px;">Telegram autopost</h2>
+<p class="hint" style="margin-bottom:16px;">
+  When a chapter is published (or a scheduled one goes live), a message is posted automatically to this channel.
+  Get a bot token from <a href="https://t.me/BotFather" target="_blank" rel="noopener">@BotFather</a>, then add the bot as an admin of your channel.
+</p>
+
+<form action="/admin/settings" method="POST" style="max-width:520px;">
+  <div class="field">
+    <label>Bot token</label>
+    <input type="text" name="telegram_bot_token" value="<%= telegramBotToken %>" placeholder="123456:ABC-DEF..." />
+  </div>
+  <div class="field">
+    <label>Channel ID</label>
+    <input type="text" name="telegram_channel_id" value="<%= telegramChannelId %>" placeholder="@yourchannel or -100123456789" />
+  </div>
+  <div class="field">
+    <div class="checkbox-row">
+      <input type="checkbox" id="autopost" name="telegram_autopost_enabled" value="1" <%= autopostEnabled ? 'checked' : '' %> />
+      <label for="autopost">Autopost new chapters to this channel</label>
+    </div>
+  </div>
+  <div class="btn-row">
+    <button type="submit" class="btn btn-red">Save Settings</button>
+  </div>
+</form>
+
+<form action="/admin/settings/test-telegram" method="POST" style="max-width:520px;margin-top:12px;">
+  <button type="submit" class="btn btn-ghost">Send test message</button>
+</form>
+
+<%- include('../partials/admin-footer') %>

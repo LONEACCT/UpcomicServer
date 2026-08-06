@@ -6,7 +6,8 @@ const { requireAdmin } = require('../middleware/auth');
 const { uploadCover, uploadPages, uploadBulkZips, uploadChapterMedia, pagesDir, coversDir } = require('../upload');
 const { generateCode, slugify } = require('../utils');
 const { extractZipImages, chapterNumberFromFilename } = require('../lib/zip-utils');
-const { notifyNewChapter } = require('../lib/notify');
+const { notifyNewChapter, sendTestTelegramMessage } = require('../lib/notify');
+const { getSetting, setSetting, getBoolSetting } = require('../lib/settings');
 let sharp = null;
 try { sharp = require('sharp'); } catch (e) { /* optional */ }
 
@@ -172,6 +173,37 @@ router.get('/analytics', (req, res) => {
     topComics,
     expiringSoon,
     newSignupsThisWeek,
+  });
+});
+
+// ---------- Settings ----------
+
+router.get('/settings', (req, res) => {
+  res.render('admin/settings', {
+    telegramBotToken: getSetting('telegram_bot_token', 'TELEGRAM_BOT_TOKEN'),
+    telegramChannelId: getSetting('telegram_channel_id', 'TELEGRAM_CHANNEL_ID', process.env.TELEGRAM_CHANNEL || ''),
+    autopostEnabled: getBoolSetting('telegram_autopost_enabled', null, true),
+    saved: req.query.saved || null,
+    testResult: null,
+  });
+});
+
+router.post('/settings', (req, res) => {
+  const { telegram_bot_token, telegram_channel_id, telegram_autopost_enabled } = req.body;
+  setSetting('telegram_bot_token', (telegram_bot_token || '').trim());
+  setSetting('telegram_channel_id', (telegram_channel_id || '').trim());
+  setSetting('telegram_autopost_enabled', telegram_autopost_enabled ? '1' : '0');
+  res.redirect('/admin/settings?saved=1');
+});
+
+router.post('/settings/test-telegram', async (req, res) => {
+  const testResult = await sendTestTelegramMessage();
+  res.render('admin/settings', {
+    telegramBotToken: getSetting('telegram_bot_token', 'TELEGRAM_BOT_TOKEN'),
+    telegramChannelId: getSetting('telegram_channel_id', 'TELEGRAM_CHANNEL_ID', process.env.TELEGRAM_CHANNEL || ''),
+    autopostEnabled: getBoolSetting('telegram_autopost_enabled', null, true),
+    saved: null,
+    testResult,
   });
 });
 
