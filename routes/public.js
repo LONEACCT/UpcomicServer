@@ -292,6 +292,11 @@ router.get('/comic/:slug', (req, res) => {
     latestChapter,
     isBookmarked,
     order: req.query.order === 'asc' ? 'asc' : 'desc',
+    pageTitle: comic.title,
+    ogDescription: comic.description || `Read ${comic.title} — ${comic.chapter_count} chapters, ★${comic.rating.toFixed(1)}`,
+    ogImage: comic.cover_image
+      ? (comic.cover_image.startsWith('http') ? comic.cover_image : res.locals.siteUrl + comic.cover_image)
+      : res.locals.ogImage,
   });
 });
 
@@ -379,6 +384,11 @@ router.get('/comic/:slug/chapter/:chapterId', (req, res, next) => {
       reportedCommentIds,
       prevChapter: idx > 0 ? allChapters[idx - 1] : null,
       nextChapter: idx < allChapters.length - 1 ? allChapters[idx + 1] : null,
+      pageTitle: `${comic.title} — Chapter ${chapter.chapter_number}`,
+      ogDescription: `${chapter.title} — read it now on ${res.locals.siteName}`,
+      ogImage: comic.cover_image
+        ? (comic.cover_image.startsWith('http') ? comic.cover_image : res.locals.siteUrl + comic.cover_image)
+        : res.locals.ogImage,
     });
   }
 });

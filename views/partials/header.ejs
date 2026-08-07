@@ -4,6 +4,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' — ' + siteName : siteName %></title>
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Link previews (WhatsApp, Telegram, Twitter/X, Discord, iMessage, etc.) -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="<%= siteName %>">
+  <meta property="og:title" content="<%= typeof pageTitle !== 'undefined' ? pageTitle + ' — ' + siteName : ogTitle %>">
+  <meta property="og:description" content="<%= ogDescription %>">
+  <meta property="og:image" content="<%= ogImage %>">
+  <meta property="og:url" content="<%= siteUrl %><%= typeof currentUrl !== 'undefined' ? currentUrl : '' %>">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="<%= typeof pageTitle !== 'undefined' ? pageTitle + ' — ' + siteName : ogTitle %>">
+  <meta name="twitter:description" content="<%= ogDescription %>">
+  <meta name="twitter:image" content="<%= ogImage %>">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Oswald:wght@500;600;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css" />
@@ -12,7 +30,7 @@
   <input type="checkbox" id="mobileNavToggle" class="mobile-nav-toggle" />
 
   <header class="topnav">
-    <a href="/" class="wordmark"><img src="/icons/logo.png" alt="UPCOMIC" class="logo-img" /></a>
+    <a href="/" class="wordmark"><img src="/icons/logo.png" alt="<%= siteName %>" class="logo-img" /></a>
     <nav class="main-links">
       <a href="/" class="<%= typeof active !== 'undefined' && active === 'home' ? 'active' : '' %>">Home</a>
       <a href="/#browse" class="<%= typeof active !== 'undefined' && active === 'browse' ? 'active' : '' %>">Comics</a>
@@ -31,10 +49,6 @@
       <% } else { %>
         <a href="/login" class="login-link">Login</a>
       <% } %>
-      <a href="/vip" class="vip-btn">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M2 18h20l-2-9-5 4-3-7-3 7-5-4z"/></svg>
-        Join VIP
-      </a>
       <label for="mobileNavToggle" class="hamburger-icon" aria-label="Open menu">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
       </label>

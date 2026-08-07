@@ -1,0 +1,114 @@
+<%- include('partials/header', { pageTitle: pageTitle, active: 'browse' }) %>
+
+<div class="container">
+  <div class="comic-hero">
+    <div class="cover-wrap">
+      <span class="mature-tag">Mature</span>
+      <% if (comic.cover_image) { %>
+        <img src="<%= comic.cover_image %>" alt="<%= comic.title %> cover" />
+      <% } else { %>
+        <div class="cover-placeholder">No cover yet</div>
+      <% } %>
+    </div>
+    <div>
+      <h1><%= comic.title %></h1>
+      <div class="rating-line">★ <%= comic.rating.toFixed(1) %></div>
+      <% if (comic.category_names) { %>
+        <div class="genre-line"><%= comic.category_names.split(', ').join(' • ') %></div>
+      <% } %>
+      <% if (comic.description) { %><p class="desc"><%= comic.description %></p><% } %>
+
+      <div class="stats-row">
+        <div class="stat-block"><div class="label">Status</div><div class="value"><%= comic.status %></div></div>
+        <div class="stat-block"><div class="label">Chapters</div><div class="value"><%= comic.chapter_count %></div></div>
+        <div class="stat-block"><div class="label">Views</div><div class="value"><%= formatCompactNumber(comic.views) %></div></div>
+      </div>
+
+      <div class="comic-actions">
+        <% if (latestChapter) { %>
+          <a href="/comic/<%= comic.slug %>/chapter/<%= latestChapter.id %>" class="btn btn-red">▶ Read Latest</a>
+        <% } %>
+        <% if (firstChapter) { %>
+          <a href="/comic/<%= comic.slug %>/chapter/<%= firstChapter.id %>" class="btn btn-outline">☰ Read From Start</a>
+        <% } %>
+      </div>
+
+      <div class="icon-actions">
+        <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+          <form action="/comic/<%= comic.slug %>/bookmark" method="POST">
+            <button type="submit" class="icon-action <%= isBookmarked ? 'active' : '' %>">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="<%= isBookmarked ? 'currentColor' : 'none' %>" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+              <%= isBookmarked ? 'Bookmarked' : 'Bookmark' %>
+            </button>
+          </form>
+        <% } else { %>
+          <a href="/login?next=<%= encodeURIComponent('/comic/' + comic.slug) %>" class="icon-action">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+            Bookmark
+          </a>
+        <% } %>
+        <button type="button" class="icon-action" onclick="navigator.clipboard.writeText(window.location.href); this.textContent='✓ Copied!';">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>
+          Share
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title-row">
+    <h2>Chapter List</h2>
+    <a href="?order=<%= order === 'desc' ? 'asc' : 'desc' %>" class="sort-toggle">
+      <%= order === 'desc' ? 'Descending' : 'Ascending' %>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="<%= order === 'desc' ? '6 9 12 15 18 9' : '18 15 12 9 6 15' %>"/></svg>
+    </a>
+  </div>
+
+  <% if (chapters.length === 0) { %>
+    <div class="empty-state">
+      <h3>No chapters posted yet</h3>
+      <p>Check back soon.</p>
+    </div>
+  <% } else { %>
+    <ul class="chapter-list" id="chapterList">
+      <% chapters.forEach((chapter, i) => {
+        const isNew = (Date.now() - new Date(chapter.created_at.replace(' ', 'T') + 'Z').getTime()) < 1000 * 60 * 60 * 48;
+        const href = chapter.is_premium ? '/vip' : `/comic/${comic.slug}/chapter/${chapter.id}`;
+      %>
+        <li class="<%= i >= 8 ? 'chapter-hidden' : '' %>" <%= i >= 8 ? 'style="display:none;"' : '' %>>
+          <a href="<%= href %>" class="chapter-row">
+            <div class="left">
+              <span class="chapter-play">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21"/></svg>
+              </span>
+              <div>
+                <h4>Chapter <%= chapter.chapter_number %>: <%= chapter.title %></h4>
+                <div class="chapter-sub">
+                  <% if (isNew) { %><span class="badge badge-new">New</span><% } %>
+                  <span><%= formatRelativeTime(chapter.created_at) %></span>
+                </div>
+              </div>
+            </div>
+            <% if (chapter.is_premium) { %><span class="badge badge-vip-tag">VIP</span><% } else { %><span class="badge badge-free">Free</span><% } %>
+          </a>
+        </li>
+      <% }) %>
+    </ul>
+    <% if (chapters.length > 8) { %>
+      <div class="view-all-chapters" id="viewAllBtn">View all chapters (<%= chapters.length %>) ▾</div>
+    <% } %>
+  <% } %>
+</div>
+
+<script>
+  var btn = document.getElementById('viewAllBtn');
+  if (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('#chapterList .chapter-hidden').forEach(function (el) {
+        el.style.display = '';
+      });
+      btn.style.display = 'none';
+    });
+  }
+</script>
+
+<%- include('partials/footer') %>
