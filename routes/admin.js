@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const db = require('../db');
 const { requireAdmin } = require('../middleware/auth');
-const { uploadCover, uploadPages, uploadBulkZips, uploadChapterMedia, pagesDir, coversDir } = require('../upload');
+const { uploadCover, uploadPages, uploadZip, uploadBulkZips, uploadChapterMedia, pagesDir, coversDir } = require('../upload');
 const { generateCode, slugify } = require('../utils');
 const { extractZipImages, chapterNumberFromFilename } = require('../lib/zip-utils');
 const { watermarkPages } = require('../lib/watermark');
@@ -251,8 +251,11 @@ router.post('/categories/:id/delete', (req, res) => {
 // ---------- Comics ----------
 
 router.get('/comics', (req, res) => {
-  const comics = db.prepare('SELECT * FROM comics ORDER BY created_at DESC').all();
-  res.render('admin/comics', { comics });
+  const search = (req.query.q || '').trim();
+  const comics = search
+    ? db.prepare('SELECT * FROM comics WHERE title LIKE ? ORDER BY created_at DESC').all(`%${search}%`)
+    : db.prepare('SELECT * FROM comics ORDER BY created_at DESC').all();
+  res.render('admin/comics', { comics, search });
 });
 
 router.get('/comics/new', (req, res) => {
@@ -408,7 +411,7 @@ router.post('/comics/:comicId/chapters/new', uploadChapterMedia, async (req, res
     .run(
       comic.id,
       title.trim(),
-      parseInt(chapter_number, 10),
+      parseFloat(chapter_number),
       is_premium ? 1 : 0,
       publish_at ? new Date(publish_at).toISOString() : null,
       scheduled ? 0 : 1 // if not scheduled, we notify right below, so mark as already-notified
@@ -470,7 +473,7 @@ router.post('/comics/:comicId/chapters/:chapterId/edit', (req, res) => {
      WHERE id = ?`
   ).run(
     title.trim(),
-    parseInt(chapter_number, 10),
+    parseFloat(chapter_number),
     is_premium ? 1 : 0,
     publish_at ? new Date(publish_at).toISOString() : null,
     scheduled ? 0 : chapter.notified, // only reset notified if newly (re)scheduled into the future
@@ -536,6 +539,62 @@ router.post('/comics/:comicId/chapters/bulk-zip', uploadBulkZips.array('zips', 5
   }
 
   res.redirect(`/admin/comics/${comic.id}/chapters`);
+});
+
+// ---------- Bulk ZIP upload — one file at a time (for real per-file progress in the UI) ----------
+// The page-by-page frontend calls this once per ZIP, then calls /finalize
+// once at the end so only ONE combined Telegram/push notification fires —
+// same flood-prevention as the all-at-once /bulk-zip route above.
+
+router.post('/comics/:comicId/chapters/bulk-zip/upload-one', uploadZip.single('zip'), async (req, res) => {
+  const comic = db.prepare('SELECT * FROM comics WHERE id = ?').get(req.params.comicId);
+  if (!comic) return res.status(404).json({ ok: false, error: 'Comic not found.' });
+  if (!req.file) return res.status(400).json({ ok: false, error: 'No ZIP file received.' });
+
+  const { is_premium, publish_at } = req.body;
+  const scheduled = isFuture(publish_at);
+  const chapterNumber = chapterNumberFromFilename(req.file.originalname);
+
+  try {
+    const result = db
+      .prepare(
+        `INSERT INTO chapters (comic_id, title, chapter_number, is_premium, publish_at, notified)
+         VALUES (?, ?, ?, ?, ?, ?)`
+      )
+      .run(
+        comic.id,
+        chapterNumber ? `Chapter ${chapterNumber}` : req.file.originalname.replace(/\.zip$/i, ''),
+        chapterNumber || 0,
+        is_premium ? 1 : 0,
+        publish_at ? new Date(publish_at).toISOString() : null,
+        scheduled ? 0 : 1
+      );
+    const chapterId = result.lastInsertRowid;
+    const insertPage = db.prepare('INSERT INTO pages (chapter_id, image_path, page_order) VALUES (?, ?, ?)');
+    const filenames = extractZipImages(req.file.path, pagesDir);
+    filenames.forEach((filename, i) => insertPage.run(chapterId, filename, i + 1));
+    await watermarkPages(pagesDir, filenames);
+
+    res.json({ ok: true, chapterNumber: chapterNumber || 0, scheduled });
+  } catch (e) {
+    console.log('Single bulk-zip upload failed:', e.message);
+    res.status(500).json({ ok: false, error: e.message });
+  } finally {
+    fs.unlink(req.file.path, () => {});
+  }
+});
+
+router.post('/comics/:comicId/chapters/bulk-zip/finalize', (req, res) => {
+  const comic = db.prepare('SELECT * FROM comics WHERE id = ?').get(req.params.comicId);
+  if (!comic) return res.status(404).json({ ok: false });
+
+  const chapterNumbers = Array.isArray(req.body.chapterNumbers) ? req.body.chapterNumbers : [];
+  const scheduled = !!req.body.scheduled;
+
+  if (!scheduled && chapterNumbers.length) {
+    notifyBulkChapters(comic, chapterNumbers).catch((e) => console.log('Bulk notify failed:', e.message));
+  }
+  res.json({ ok: true });
 });
 
 router.get('/comics/:comicId/chapters', (req, res) => {
